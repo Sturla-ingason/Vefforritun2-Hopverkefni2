@@ -1,0 +1,15 @@
+
+Að minnsta kosti 3 síður forsíða ekki tekin með
+    -Forsíða
+    -öll task
+    -listar
+    -listi
+    -task
+
+header
+
+footer
+
+logInn/Signup
+
+verður að vera mynda virkni
