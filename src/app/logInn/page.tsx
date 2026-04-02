@@ -19,16 +19,45 @@ export default function LogInn(){
 
         const data = await res.json()
         localStorage.setItem('token', data.token)
-        console.log(localStorage.getItem('token'))
         router.push('/')
     }
 
     return (
-        <form onSubmit={handleSubmit}>
-            <input value={email} onChange={e => setEmail(e.target.value)} type='email'/>
-            <input value={password} onChange={e => setPassword(e.target.value)} type='password'/>
-            <button type="submit">Log Inn</button>
-        </form>
+        <div className='grid grid-cols-12 min-h-screen items-center'>
+            <form onSubmit={handleSubmit} className='col-start-4 col-end-9 flex flex-col m-8'>
+                <input className="
+                        bg-white 
+                        text-black 
+                        m-2.5 
+                        p-5 
+                        rounded-2xl
+                        text-center" 
+                    value={email} 
+                    onChange={e => setEmail(e.target.value)} type='email'
+                    placeholder='email'/>
+                
+                <input className="
+                        bg-white 
+                        text-black 
+                        m-2.5 
+                        p-5 
+                        rounded-2xl
+                        text-center" 
+                    value={password} 
+                    onChange={e => setPassword(e.target.value)} type='password'
+                    placeholder='password'/>
+
+                <button className="
+                        text-black 
+                        text-center 
+                        bg-green 
+                        m-2.5 
+                        p-5 
+                        rounded-2xl"
+                    type="submit">Log Inn</button>
+            </form>
+        </div>
+        
     )
 
 }
