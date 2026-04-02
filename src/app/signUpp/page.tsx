@@ -24,12 +24,52 @@ export default function SignUpp(){
     }
 
     return (
-        <form onSubmit={handleSignUpp}>
-            <input value={email} onChange={e => setEmail(e.target.value)} type='email'/>
-            <input value={password} onChange={e => setPassword(e.target.value)} type='password'/>
-            <input value={name} onChange={e => setName(e.target.value)} type='name'/>
-            <button type='submit'>Sign upp</button>
-        </form>
+        <div className='grid grid-cols-12 min-h-screen items-center'>
+            <form onSubmit={handleSignUpp} className='col-start-4 col-end-9 flex flex-col m-8'>
+                <input className='
+                    bg-white 
+                    text-black 
+                    m-2.5 
+                    p-5 
+                    rounded-2xl
+                    text-center'
+                    value={email} 
+                    onChange={e => setEmail(e.target.value)} type='email'
+                    placeholder='email'/>
+                
+                <input className='
+                    bg-white 
+                    text-black 
+                    m-2.5 
+                    p-5 
+                    rounded-2xl
+                    text-center'
+                value={password} 
+                onChange={e => setPassword(e.target.value)} type='password'
+                placeholder='password'/>
+
+                <input className='
+                    bg-white 
+                    text-black 
+                    m-2.5 
+                    p-5 
+                    rounded-2xl
+                    text-center'
+                value={name} 
+                onChange={e => setName(e.target.value)} type='name'
+                placeholder='name'/>
+
+                <button className='
+                    text-black 
+                    text-center 
+                    bg-green 
+                    m-2.5 
+                    p-5 
+                    rounded-2xl'
+                type='submit'>Sign upp</button>
+            </form>
+        </div>
+
     )
     
 }
