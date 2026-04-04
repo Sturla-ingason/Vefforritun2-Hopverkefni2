@@ -12,7 +12,7 @@ export default function SignUpp(){
 
     async function handleSignUpp(e: BaseSyntheticEvent){
         e.preventDefault()
-        const res = await fetch('http://localhost:3002/user/createnewuser', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/createnewuser`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password, name }),

@@ -11,7 +11,7 @@ export default function LogInn(){
 
     async function handleSubmit(e: BaseSyntheticEvent) {
         e.preventDefault()
-        const res = await fetch('http://localhost:3002/user/login', {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
