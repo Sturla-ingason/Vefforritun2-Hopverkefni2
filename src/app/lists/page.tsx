@@ -1,6 +1,5 @@
 'use client'
 
-import Header from "@/components/Header"
 import List from "@/components/List"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -55,7 +54,6 @@ export default function Page(){
 
     return (
         <main className="grid grid-cols-12">
-            <Header/>
             <Link href="/" className='col-start-3 col-end-4 flex justify-center items-center'><button>Back</button></Link>
             <Link href="/create/createList" className="col-start-3 col-end-11 text-center bg-green text-black rounded-2xl p-2 m-3"><button>Create New List</button></Link>
             {renderLists()}

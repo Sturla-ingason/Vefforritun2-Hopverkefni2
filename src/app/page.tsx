@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Task from "@/components/Task"
-import Header from '@/components/Header'
 import { NewState } from '@/components/States'
 
 type TaskType = {
@@ -58,11 +57,8 @@ export default function Home() {
   }
 
   return (
-    <div>
-      <main className="grid grid-cols-12">
-        <Header/>
-        {renderTasks()}
-      </main>
+    <div className="grid grid-cols-12">
+      {renderTasks()}
     </div>
   )
 }
