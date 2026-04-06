@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Task from "@/components/Task"
-import Link from 'next/link'
+import Header from '@/components/Header'
 
 
 type TaskType = {
@@ -21,7 +21,7 @@ export default function Home() {
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (!token) {
-      router.push('/logInn')
+      router.push('/auth/logInn')
       return
     }
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/my`, {
@@ -34,16 +34,11 @@ export default function Home() {
   }, [router])
 
 
-  function handleLogout() {
-    localStorage.removeItem('token')
-    router.push('/logInn')
-  }
-
 
   return (
     <div>
-      <Link href="/lists"><button>LISTS</button></Link>
       <main className="grid grid-cols-12">
+        <Header/>
         {tasks.map(task => (
           <Task
             key={task.id}
@@ -54,7 +49,6 @@ export default function Home() {
             done={task.done}
           />
         ))}
-        <button onClick={handleLogout}>Logout</button>
       </main>
     </div>
   )

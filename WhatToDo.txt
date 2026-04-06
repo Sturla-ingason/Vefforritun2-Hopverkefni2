@@ -1,15 +1,44 @@
 
 Að minnsta kosti 3 síður forsíða ekki tekin með
-    -Forsíða
-    -öll task
-    -listar
-    -listi
-    -task
+    -Forsíða - DONE
+    -öll task - DONE
+    -listar - DONE 
+    -listi - DONE
+    -task - DONE
+    -create new task - DONE
+    -create new list - DONE
+
 
 header
 
 footer
 
-logInn/Signup
+logInn/Signup - DONE
 
 verður að vera mynda virkni
+
+TODO:
+    - Græja loading state þegar verið er að sækja gögn
+    - villu meðhöndlun ef gögn eru tóm.
+
+
+TODO:
+    Task
+        create - DONE
+        delete - DONE
+        edit - DONE
+    List
+        create - DONE
+        delete - DONE
+        add To - DONE
+        remove from - DONE
+    Tags
+        create - DONE
+        delete - DONE
+        add - DONE
+        remove - DONE
+        update?
+    Subtask
+        create - DONE
+        delete - DONE
+        edit?

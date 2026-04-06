@@ -31,7 +31,7 @@ export default function Task({ id, name, description, tags, done }: TaskProps){
     return (
         <div className="flex justify-between items-center bg-white m-3 rounded-2xl col-start-3 col-end-10">
             <div className="flex flex-col flex-2 p-1 text-black">
-                <h2 className={isDone ? 'line-through' : ''}>{name}</h2>
+                <h2 className={`font-bold &{isDone ? 'line-through' : ''}`}>{name}</h2>
                 <p>{description}</p>
             </div>
             <div className="flex flex-col flex-1 p-1 text-black text-center">
@@ -41,7 +41,7 @@ export default function Task({ id, name, description, tags, done }: TaskProps){
                 <button onClick={handleDone} className="bg-green p-1 m-1 rounded-2xl">
                     {isDone ? 'Undo' : 'Done'}
                 </button>
-                <Link href={`/task/${id}`} className="bg-green p-1 m-1 rounded-2xl text-center"><button>Details</button></Link>
+                <Link href={`/instance/task/${id}`} className="bg-green p-1 m-1 rounded-2xl text-center"><button>Details</button></Link>
             </div>
         </div>
     )
