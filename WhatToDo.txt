@@ -20,6 +20,15 @@ verður að vera mynda virkni
 TODO:
     - Græja loading state þegar verið er að sækja gögn
     - villu meðhöndlun ef gögn eru tóm.
+    - Klára að skoða Villur ef eitthvað kemur upp
+        -loading
+        -404 error
+        -tóm gögn
+        -aðiri errorar
+    - Skalanleiki
+    - image handeling
+    - Fótur
+    - Head
 
 
 TODO:

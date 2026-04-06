@@ -178,7 +178,7 @@ export default function TaskPage() {
 
     return (
         <main className="grid grid-cols-12 min-h-screen">
-            <div className="col-start-3 col-end-10 bg-white rounded-2xl m-8 p-8 text-black flex flex-col gap-4">
+            <div className="col-start-3 col-end-11 bg-white rounded-2xl m-8 p-8 text-black flex flex-col gap-4">
                 <div className='justify-between flex'>
                     {isEditing ? (
                         <input

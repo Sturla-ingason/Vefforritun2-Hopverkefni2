@@ -17,7 +17,7 @@ export default function Header(){
     }
 
     return (
-        <div className="p-10 col-start-1 col-end-13">
+        <div className="p-10 col-start-1 col-end-13 text-center">
             <Link href={"/"}><button className="p-2">Home</button></Link>
             <Link href="/lists"><button className="p-2">Lists</button></Link>
             <Link href="/create/createNewTask"><button className="p-2">CreateNewTask</button></Link>

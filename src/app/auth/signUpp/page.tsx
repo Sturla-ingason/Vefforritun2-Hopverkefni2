@@ -2,6 +2,7 @@
 
 import { useState, BaseSyntheticEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link';
 
 export default function SignUpp(){
 
@@ -67,6 +68,7 @@ export default function SignUpp(){
                     p-5 
                     rounded-2xl'
                 type='submit'>Sign upp</button>
+                <Link href="/auth/logInn" className='text-center'>Already have a account?</Link>
             </form>
         </div>
 
