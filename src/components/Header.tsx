@@ -1,14 +1,17 @@
 'use client'
 
 import Link from "next/link";
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 
-export default function Header(){
+const navLinks = [
+    { href: '/', label: 'Home' },
+    { href: '/lists', label: 'Lists' },
+    { href: '/tags', label: 'Tags' },
+    { href: '/create/createNewTask', label: 'New Task' },
+]
 
-    //TODO þarf að vera linkur á lista notendans
-    //TODO þarf að vera linkur aftur a index síðuna
-    //TODO vera log out taki þannig að notandi geti loggað sig út af aðgangnum sínum
-
+export default function Header() {
+    const pathname = usePathname()
     const router = useRouter()
 
     function handleLogout() {
@@ -17,13 +20,28 @@ export default function Header(){
     }
 
     return (
-        <div className="p-10 col-start-1 col-end-13 text-center">
-            <Link href={"/"}><button className="p-2">Home</button></Link>
-            <Link href="/lists"><button className="p-2">Lists</button></Link>
-            <Link href="/create/createNewTask"><button className="p-2">CreateNewTask</button></Link>
-            <Link href="/tags"><button className="p-2">Tags</button></Link>
-            <button onClick={handleLogout} className="p-2">Logout</button>
-        </div>
+        <header className="flex justify-between items-center px-6 py-2 bg-white text-black border-b text-sm">
+            <nav className="flex gap-1">
+                {navLinks.map(({ href, label }) => (
+                    <Link
+                        key={href}
+                        href={href}
+                        className={`px-3 py-1.5 rounded-lg font-medium transition-colors ${
+                            pathname === href
+                                ? 'bg-green text-black'
+                                : 'hover:bg-gray-100 text-gray-600'
+                        }`}
+                    >
+                        {label}
+                    </Link>
+                ))}
+            </nav>
+            <button
+                onClick={handleLogout}
+                className="px-3 py-1.5 rounded-lg hover:bg-gray-100 text-gray-600 font-medium"
+            >
+                Logout
+            </button>
+        </header>
     )
-
 }

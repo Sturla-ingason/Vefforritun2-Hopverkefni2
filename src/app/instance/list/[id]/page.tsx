@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Task from '@/components/Task'
-import Header from '@/components/Header'
 import Link from 'next/link'
 
 type TaskType = {
@@ -68,7 +67,6 @@ export default function ListPage() {
     return (
         <div>
             <main className="grid grid-cols-12">
-                <Header/>
                 <Link href="/lists" className='col-start-3 col-end-4 flex justify-center items-center'><button>Back</button></Link>
                 <h1 className="text-2xl p-4 col-start-5 col-end-8 text-center">{listName}</h1>
                 {tasks.map(task => (

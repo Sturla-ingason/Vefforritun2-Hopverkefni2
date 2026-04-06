@@ -2,7 +2,6 @@
 
 import { useState, BaseSyntheticEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import Header from "@/components/Header"
 
 export default function CreateTag() {
     const [name, setName] = useState('')
@@ -28,7 +27,6 @@ export default function CreateTag() {
 
     return (
         <main>
-            <Header />
             <div className="grid grid-cols-12">
                 <form onSubmit={handleSubmit} className="col-start-3 col-end-11 bg-white rounded-2xl m-8 p-8 text-black flex flex-col gap-4">
                     <h1 className="text-2xl font-bold">Create New Tag</h1>

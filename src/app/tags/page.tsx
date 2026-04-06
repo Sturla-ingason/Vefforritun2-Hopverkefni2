@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import Header from "@/components/Header"
 import Tag from "@/components/Tag"
 import Link from "next/link"
 import { NewState } from "@/components/States"
@@ -56,7 +55,6 @@ export default function Tags() {
 
     return (
         <main className="grid grid-cols-12">
-            <Header />
             <Link href="/create/createTag" className="col-start-3 col-end-11 text-center bg-green text-black rounded-2xl p-2 m-2">
                 Create New Tag
             </Link>
