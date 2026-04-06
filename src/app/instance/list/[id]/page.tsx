@@ -81,7 +81,7 @@ export default function ListPage() {
                         done={task.done}
                     />
                 ))}
-                <button onClick={handleDelete} className='col-start-3 col-end-10 text-center bg-red-500 rounded-2xl m-3 p-2'>Delete</button>
+                <button onClick={handleDelete} className='col-start-3 col-end-11 text-center bg-red-500 rounded-2xl m-3 p-2'>Delete</button>
             </main>
         </div>
     )
