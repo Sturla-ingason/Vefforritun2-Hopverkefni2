@@ -2,26 +2,35 @@
 
 import { useState, BaseSyntheticEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import { NewState } from '@/components/States'
 
 export default function CreateList() {
     const [name, setName] = useState('')
+    const [state, setState] = useState<NewState>('initial')
     const router = useRouter()
 
     async function handleSubmit(e: BaseSyntheticEvent) {
         e.preventDefault()
-        const token = localStorage.getItem('token')
+        setState('Loading')
+        try {
+            const token = localStorage.getItem('token')
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/lists/create`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ name }),
+            })
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/lists/create`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ name }),
-        })
+            if (!res.ok) {
+                setState('Error')
+                return
+            }
 
-        if (res.ok) {
             router.push('/lists')
+        } catch {
+            setState('Error')
         }
     }
 
@@ -37,8 +46,11 @@ export default function CreateList() {
                     className="border rounded-xl p-3"
                     required
                 />
-                <button type="submit" className="bg-green rounded-2xl p-3">
-                    Create List
+                {state === 'Error' && (
+                    <p className="text-red-500">Failed to create list. Please try again.</p>
+                )}
+                <button type="submit" disabled={state === 'Loading'} className="bg-green rounded-2xl p-3 disabled:opacity-50">
+                    {state === 'Loading' ? 'Creating...' : 'Create List'}
                 </button>
             </form>
             </div>

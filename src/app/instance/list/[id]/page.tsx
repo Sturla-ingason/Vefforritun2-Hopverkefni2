@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import Task from '@/components/Task'
 import Link from 'next/link'
+import { NewState } from '@/components/States'
 
 type TaskType = {
     id: number
@@ -22,6 +23,7 @@ type ListType = {
 export default function ListPage() {
     const [tasks, setTasks] = useState<TaskType[]>([])
     const [listName, setListName] = useState('')
+    const [state, setState] = useState<NewState>('Loading')
     const router = useRouter()
     const params = useParams()
     const id = Number(params.id)
@@ -33,26 +35,37 @@ export default function ListPage() {
             return
         }
 
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/my`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (Array.isArray(data)) {
-                    setTasks(data.filter((t: TaskType) => t.listId === id))
+        Promise.all([
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/my`, {
+                headers: { Authorization: `Bearer ${token}` },
+            }),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/lists/my`, {
+                headers: { Authorization: `Bearer ${token}` },
+            }),
+        ])
+            .then(async ([tasksRes, listsRes]) => {
+                if (!tasksRes.ok || !listsRes.ok) {
+                    setState('Error')
+                    return
+                }
+                const [tasksData, listsData] = await Promise.all([
+                    tasksRes.json(),
+                    listsRes.json(),
+                ])
+                if (Array.isArray(tasksData)) {
+                    setTasks(tasksData.filter((t: TaskType) => t.listId === id))
+                }
+                if (Array.isArray(listsData)) {
+                    const list = listsData.find((l: ListType) => l.id === id)
+                    if (list) {
+                        setListName(list.name)
+                        setState('Data')
+                    } else {
+                        setState('Error')
+                    }
                 }
             })
-
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/lists/my`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (Array.isArray(data)) {
-                    const list = data.find((l: ListType) => l.id === id)
-                    if (list) setListName(list.name)
-                }
-            })
+            .catch(() => setState('Error'))
     }, [router, id])
 
     async function handleDelete() {
@@ -63,6 +76,9 @@ export default function ListPage() {
         })
         if (res.ok) router.push('/lists')
     }
+
+    if (state === 'Loading') return <p className="text-center p-8">Loading...</p>
+    if (state === 'Error') return <p className="text-center p-8 text-red-500">List not found.</p>
 
     return (
         <div>
