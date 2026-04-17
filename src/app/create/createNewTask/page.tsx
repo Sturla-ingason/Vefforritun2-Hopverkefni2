@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, BaseSyntheticEvent } from 'react'
+import { useState, useEffect, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
@@ -14,6 +14,7 @@ export default function CreateNewTask() {
     const [description, setDescription] = useState('')
     const [tag, setTag] = useState('')
     const [tags, setTags] = useState<TagType[]>([])
+    const [imageFile, setImageFile] = useState<File | null>(null)
     const router = useRouter()
 
     useEffect(() => {
@@ -25,9 +26,11 @@ export default function CreateNewTask() {
             .then(data => { if (Array.isArray(data)) setTags(data) })
     }, [])
 
-    async function handleSubmit(e: BaseSyntheticEvent) {
+    async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault()
         const token = localStorage.getItem('token')
+
+        if (!token) return
 
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks`, {
             method: 'POST',
@@ -38,9 +41,26 @@ export default function CreateNewTask() {
             body: JSON.stringify({ name, description, tag }),
         })
 
-        if (res.ok) {
-            router.push('/')
+        const createdTask = await res.json()
+
+        if (!res.ok) {
+            return
         }
+
+        if (imageFile) {
+            const formData = new FormData()
+            formData.append('image', imageFile)
+
+            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${createdTask.id}/image`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                body: formData,
+            })
+        }
+
+        router.push('/')
     }
 
     return (
@@ -76,6 +96,14 @@ export default function CreateNewTask() {
                             New Tag
                         </Link>
                     </div>
+
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={e => setImageFile(e.target.files?.[0] ?? null)}
+                        className="border rounded-xl p-3"
+                    />
+
                     <button type="submit" className="bg-green rounded-2xl p-3">
                         Create Task
                     </button>
