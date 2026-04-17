@@ -29,7 +29,7 @@ export default function Task({ id, name, description, tags, done }: TaskProps){
     }
 
     return (
-        <div className="flex justify-between items-center bg-white m-3 rounded-2xl col-start-3 col-end-11">
+        <div className="flex justify-between items-center bg-white m-3 rounded-2xl col-start-3 col-end-11 md:flex-row flex-col">
             <div className="flex flex-col flex-2 p-1 text-black">
                 <h2 className={`font-bold ${isDone ? 'line-through' : ''}`}>{name}</h2>
                 <p>{description}</p>

@@ -45,8 +45,8 @@ export default function CreateNewTask() {
 
     return (
         <main>
-            <div className="grid grid-cols-12">
-                <form onSubmit={handleSubmit} className="col-start-3 col-end-11 bg-white rounded-2xl m-8 p-8 text-black flex flex-col gap-4">
+        <div className="grid grid-cols-12">
+                <form onSubmit={handleSubmit} className="col-start-1 col-end-13 bg-white rounded-2xl m-8 p-8 text-black flex flex-col gap-4 md:col-start-3 md:col-end-11">
                     <h1 className="text-2xl font-bold">Create New Task</h1>
                     <input
                         value={name}
