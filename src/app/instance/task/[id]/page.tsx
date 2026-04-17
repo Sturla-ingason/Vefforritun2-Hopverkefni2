@@ -14,6 +14,7 @@ type TaskDetail = {
     userId: string
     createdAt: string
     updatedAt: string
+    imageUrl: string | null
 }
 
 type Subtask = {
@@ -41,6 +42,7 @@ export default function TaskPage() {
     const [isEditing, setIsEditing] = useState(false)
     const [editName, setEditName] = useState('')
     const [editDescription, setEditDescription] = useState('')
+    const [editImageFile, setEditImageFile] = useState<File | null>(null)
     const router = useRouter()
     const params = useParams()
     const id = params.id
@@ -126,6 +128,7 @@ export default function TaskPage() {
     function handleEditOpen() {
         setEditName(task?.name ?? '')
         setEditDescription(task?.description ?? '')
+        setEditImageFile(null)
         setIsEditing(true)
     }
 
@@ -145,11 +148,33 @@ export default function TaskPage() {
             }),
         })
         const data = await res.json()
-        if (data.id) {
-            setTask(data)
-            setIsEditing(false)
+        if (!res.ok || !data.id) return
+
+    let updatedTask = data
+
+    if (editImageFile) {
+        const formData = new FormData()
+        formData.append('image', editImageFile)
+
+        const imageRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}/image`, {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+        })
+
+        const imageData = await imageRes.json()
+
+        if (imageRes.ok) {
+            updatedTask = { ...updatedTask, imageUrl: imageData.imageUrl }
         }
     }
+
+    setTask(updatedTask)
+    setEditImageFile(null)
+    setIsEditing(false)
+}
 
     async function handleDelete() {
         const token = localStorage.getItem('token')
@@ -203,16 +228,44 @@ export default function TaskPage() {
                         </button>
                     </div>
                 </div>
-                {isEditing ? (
-                    <textarea
-                        value={editDescription}
-                        onChange={e => setEditDescription(e.target.value)}
-                        className="border rounded-xl p-2"
-                        rows={3}
+                        {isEditing ? (
+            <div className="flex flex-col gap-3">
+                <textarea
+                    value={editDescription}
+                    onChange={e => setEditDescription(e.target.value)}
+                    className="border rounded-xl p-2"
+                    rows={3}
+                />
+
+
+                {task.imageUrl && (
+                    <img
+                        src={task.imageUrl}
+                        alt={task.name}
+                        className="w-80 max-w-full rounded-2xl border"
                     />
-                ) : (
-                    <p>{task.description ?? 'No description'}</p>
                 )}
+
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={e => setEditImageFile(e.target.files?.[0] ?? null)}
+                    className="border rounded-xl p-2"
+                />
+            </div>
+        ) : (
+            <>
+                <p>{task.description ?? 'No description'}</p>
+
+                {task.imageUrl && (
+                    <img
+                        src={task.imageUrl}
+                        alt={task.name}
+                        className="w-80 max-w-full rounded-2xl border"
+                    />
+                )}
+            </>
+        )}
                 <div className="flex gap-2 items-center">
                     <span className="font-semibold">Tags:</span>
                     <select
