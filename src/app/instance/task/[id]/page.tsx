@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import SubtaskSection from '@/components/SubtaskSection'
+import { NewState } from '@/components/States'
 
 type TaskDetail = {
     id: number
@@ -38,6 +39,7 @@ export default function TaskPage() {
     const [subtasks, setSubtasks] = useState<Subtask[]>([])
     const [lists, setLists] = useState<ListType[]>([])
     const [tags, setTags] = useState<TagType[]>([])
+    const [state, setState] = useState<NewState>('Loading')
     const [isEditing, setIsEditing] = useState(false)
     const [editName, setEditName] = useState('')
     const [editDescription, setEditDescription] = useState('')
@@ -52,37 +54,42 @@ export default function TaskPage() {
             return
         }
 
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.id) setTask(data)
+        Promise.all([
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            }),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/subtasks/task/${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            }),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/lists/my`, {
+                headers: { Authorization: `Bearer ${token}` },
+            }),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/tags/my`, {
+                headers: { Authorization: `Bearer ${token}` },
+            }),
+        ])
+            .then(async ([taskRes, subtaskRes, listsRes, tagsRes]) => {
+                if (!taskRes.ok) {
+                    setState('Error')
+                    return
+                }
+                const [taskData, subtaskData, listsData, tagsData] = await Promise.all([
+                    taskRes.json(),
+                    subtaskRes.json(),
+                    listsRes.json(),
+                    tagsRes.json(),
+                ])
+                if (!taskData.id) {
+                    setState('Error')
+                    return
+                }
+                setTask(taskData)
+                if (Array.isArray(subtaskData)) setSubtasks(subtaskData)
+                if (Array.isArray(listsData)) setLists(listsData)
+                if (Array.isArray(tagsData)) setTags(tagsData)
+                setState('Data')
             })
-
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/subtasks/task/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (Array.isArray(data)) setSubtasks(data)
-            })
-
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/lists/my`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (Array.isArray(data)) setLists(data)
-            })
-
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/tags/my`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (Array.isArray(data)) setTags(data)
-            })
+            .catch(() => setState('Error'))
     }, [router, id])
 
     async function handleAssignList(listId: number | null) {
@@ -174,7 +181,9 @@ export default function TaskPage() {
         setTask(prev => prev ? { ...prev, done: !prev.done } : prev)
     }
 
-    if (!task) return <p>Loading...</p>
+    if (state === 'Loading') return <p className="text-center p-8">Loading...</p>
+    if (state === 'Error') return <p className="text-center p-8 text-red-500">Task not found.</p>
+    if (!task) return null
 
     return (
         <main className="grid grid-cols-12 min-h-screen">

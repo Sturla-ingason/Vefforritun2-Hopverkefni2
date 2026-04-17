@@ -2,26 +2,35 @@
 
 import { useState, BaseSyntheticEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import { NewState } from '@/components/States'
 
 export default function CreateTag() {
     const [name, setName] = useState('')
+    const [state, setState] = useState<NewState>('initial')
     const router = useRouter()
 
     async function handleSubmit(e: BaseSyntheticEvent) {
         e.preventDefault()
-        const token = localStorage.getItem('token')
+        setState('Loading')
+        try {
+            const token = localStorage.getItem('token')
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tags/create`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({ name }),
+            })
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tags/create`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ name }),
-        })
+            if (!res.ok) {
+                setState('Error')
+                return
+            }
 
-        if (res.ok) {
             router.push('/tags')
+        } catch {
+            setState('Error')
         }
     }
 
@@ -37,8 +46,11 @@ export default function CreateTag() {
                         className="border rounded-xl p-3"
                         required
                     />
-                    <button type="submit" className="bg-green rounded-2xl p-3">
-                        Create Tag
+                    {state === 'Error' && (
+                        <p className="text-red-500">Failed to create tag. Please try again.</p>
+                    )}
+                    <button type="submit" disabled={state === 'Loading'} className="bg-green rounded-2xl p-3 disabled:opacity-50">
+                        {state === 'Loading' ? 'Creating...' : 'Create Tag'}
                     </button>
                 </form>
             </div>
