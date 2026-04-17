@@ -3,6 +3,7 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { NewState } from '@/components/States'
 
 type TagType = {
     id: number
@@ -15,6 +16,7 @@ export default function CreateNewTask() {
     const [tag, setTag] = useState('')
     const [tags, setTags] = useState<TagType[]>([])
     const [imageFile, setImageFile] = useState<File | null>(null)
+    const [state, setState] = useState<NewState>('initial')
     const router = useRouter()
 
     useEffect(() => {
@@ -28,39 +30,48 @@ export default function CreateNewTask() {
 
     async function handleSubmit(e: FormEvent<HTMLFormElement>) {
         e.preventDefault()
-        const token = localStorage.getItem('token')
+        setState('Loading')
+        try {
+            const token = localStorage.getItem('token')
 
-        if (!token) return
+            if (!token) {
+                setState('Error')
+                return
+            }
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ name, description, tag }),
-        })
-
-        const createdTask = await res.json()
-
-        if (!res.ok) {
-            return
-        }
-
-        if (imageFile) {
-            const formData = new FormData()
-            formData.append('image', imageFile)
-
-            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${createdTask.id}/image`, {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks`, {
                 method: 'POST',
                 headers: {
+                    'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
-                body: formData,
+                body: JSON.stringify({ name, description, tag }),
             })
-        }
 
-        router.push('/')
+            const createdTask = await res.json()
+
+            if (!res.ok) {
+                setState('Error')
+                return
+            }
+
+            if (imageFile) {
+                const formData = new FormData()
+                formData.append('image', imageFile)
+
+                await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${createdTask.id}/image`, {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: formData,
+                })
+            }
+
+            router.push('/')
+        } catch {
+            setState('Error')
+        }
     }
 
     return (
@@ -104,8 +115,11 @@ export default function CreateNewTask() {
                         className="border rounded-xl p-3"
                     />
 
-                    <button type="submit" className="bg-green rounded-2xl p-3">
-                        Create Task
+                    {state === 'Error' && (
+                        <p className="text-red-500">Failed to create task. Please try again.</p>
+                    )}
+                    <button type="submit" disabled={state === 'Loading'} className="bg-green rounded-2xl p-3 disabled:opacity-50">
+                        {state === 'Loading' ? 'Creating...' : 'Create Task'}
                     </button>
                 </form>
             </div>

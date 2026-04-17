@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import SubtaskSection from '@/components/SubtaskSection'
+import { NewState } from '@/components/States'
 
 type TaskDetail = {
     id: number
@@ -39,6 +40,7 @@ export default function TaskPage() {
     const [subtasks, setSubtasks] = useState<Subtask[]>([])
     const [lists, setLists] = useState<ListType[]>([])
     const [tags, setTags] = useState<TagType[]>([])
+    const [state, setState] = useState<NewState>('Loading')
     const [isEditing, setIsEditing] = useState(false)
     const [editName, setEditName] = useState('')
     const [editDescription, setEditDescription] = useState('')
@@ -54,37 +56,42 @@ export default function TaskPage() {
             return
         }
 
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (data.id) setTask(data)
+        Promise.all([
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            }),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/subtasks/task/${id}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            }),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/lists/my`, {
+                headers: { Authorization: `Bearer ${token}` },
+            }),
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/tags/my`, {
+                headers: { Authorization: `Bearer ${token}` },
+            }),
+        ])
+            .then(async ([taskRes, subtaskRes, listsRes, tagsRes]) => {
+                if (!taskRes.ok) {
+                    setState('Error')
+                    return
+                }
+                const [taskData, subtaskData, listsData, tagsData] = await Promise.all([
+                    taskRes.json(),
+                    subtaskRes.json(),
+                    listsRes.json(),
+                    tagsRes.json(),
+                ])
+                if (!taskData.id) {
+                    setState('Error')
+                    return
+                }
+                setTask(taskData)
+                if (Array.isArray(subtaskData)) setSubtasks(subtaskData)
+                if (Array.isArray(listsData)) setLists(listsData)
+                if (Array.isArray(tagsData)) setTags(tagsData)
+                setState('Data')
             })
-
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/subtasks/task/${id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (Array.isArray(data)) setSubtasks(data)
-            })
-
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/lists/my`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (Array.isArray(data)) setLists(data)
-            })
-
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/tags/my`, {
-            headers: { Authorization: `Bearer ${token}` },
-        })
-            .then(res => res.json())
-            .then(data => {
-                if (Array.isArray(data)) setTags(data)
-            })
+            .catch(() => setState('Error'))
     }, [router, id])
 
     async function handleAssignList(listId: number | null) {
@@ -150,31 +157,31 @@ export default function TaskPage() {
         const data = await res.json()
         if (!res.ok || !data.id) return
 
-    let updatedTask = data
+        let updatedTask = data
 
-    if (editImageFile) {
-        const formData = new FormData()
-        formData.append('image', editImageFile)
+        if (editImageFile) {
+            const formData = new FormData()
+            formData.append('image', editImageFile)
 
-        const imageRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}/image`, {
-            method: 'POST',
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-            body: formData,
-        })
+            const imageRes = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks/${id}/image`, {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+                body: formData,
+            })
 
-        const imageData = await imageRes.json()
+            const imageData = await imageRes.json()
 
-        if (imageRes.ok) {
-            updatedTask = { ...updatedTask, imageUrl: imageData.imageUrl }
+            if (imageRes.ok) {
+                updatedTask = { ...updatedTask, imageUrl: imageData.imageUrl }
+            }
         }
-    }
 
-    setTask(updatedTask)
-    setEditImageFile(null)
-    setIsEditing(false)
-}
+        setTask(updatedTask)
+        setEditImageFile(null)
+        setIsEditing(false)
+    }
 
     async function handleDelete() {
         const token = localStorage.getItem('token')
@@ -199,7 +206,9 @@ export default function TaskPage() {
         setTask(prev => prev ? { ...prev, done: !prev.done } : prev)
     }
 
-    if (!task) return <p>Loading...</p>
+    if (state === 'Loading') return <p className="text-center p-8">Loading...</p>
+    if (state === 'Error') return <p className="text-center p-8 text-red-500">Task not found.</p>
+    if (!task) return null
 
     return (
         <main className="grid grid-cols-12 min-h-screen">
@@ -228,44 +237,40 @@ export default function TaskPage() {
                         </button>
                     </div>
                 </div>
-                        {isEditing ? (
-            <div className="flex flex-col gap-3">
-                <textarea
-                    value={editDescription}
-                    onChange={e => setEditDescription(e.target.value)}
-                    className="border rounded-xl p-2"
-                    rows={3}
-                />
-
-
-                {task.imageUrl && (
-                    <img
-                        src={task.imageUrl}
-                        alt={task.name}
-                        className="w-80 max-w-full rounded-2xl border"
-                    />
+                {isEditing ? (
+                    <div className="flex flex-col gap-3">
+                        <textarea
+                            value={editDescription}
+                            onChange={e => setEditDescription(e.target.value)}
+                            className="border rounded-xl p-2"
+                            rows={3}
+                        />
+                        {task.imageUrl && (
+                            <img
+                                src={task.imageUrl}
+                                alt={task.name}
+                                className="w-80 max-w-full rounded-2xl border"
+                            />
+                        )}
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={e => setEditImageFile(e.target.files?.[0] ?? null)}
+                            className="border rounded-xl p-2"
+                        />
+                    </div>
+                ) : (
+                    <>
+                        <p>{task.description ?? 'No description'}</p>
+                        {task.imageUrl && (
+                            <img
+                                src={task.imageUrl}
+                                alt={task.name}
+                                className="w-80 max-w-full rounded-2xl border"
+                            />
+                        )}
+                    </>
                 )}
-
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={e => setEditImageFile(e.target.files?.[0] ?? null)}
-                    className="border rounded-xl p-2"
-                />
-            </div>
-        ) : (
-            <>
-                <p>{task.description ?? 'No description'}</p>
-
-                {task.imageUrl && (
-                    <img
-                        src={task.imageUrl}
-                        alt={task.name}
-                        className="w-80 max-w-full rounded-2xl border"
-                    />
-                )}
-            </>
-        )}
                 <div className="flex gap-2 items-center">
                     <span className="font-semibold">Tags:</span>
                     <select
@@ -307,7 +312,7 @@ export default function TaskPage() {
                 </div>
 
                 <SubtaskSection taskId={String(id)} initialSubtasks={subtasks} />
-                
+
                 <button onClick={handleDone} className="bg-green rounded-2xl p-2 mt-4">
                     {task.done ? 'Undo' : 'Done'}
                 </button>
