@@ -9,9 +9,10 @@ type TaskProps = {
     description?: string | null
     tags?: string | null
     done: boolean
+    imageUrl?: string | null
 }
 
-export default function Task({ id, name, description, tags, done }: TaskProps){
+export default function Task({ id, name, description, tags, done, imageUrl }: TaskProps){
     const [isDone, setIsDone] = useState(done)
 
     async function handleDone() {
@@ -33,6 +34,14 @@ export default function Task({ id, name, description, tags, done }: TaskProps){
             <div className="flex flex-col flex-2 p-1 text-black">
                 <h2 className={`font-bold ${isDone ? 'line-through' : ''}`}>{name}</h2>
                 <p>{description}</p>
+
+                {imageUrl && (
+                    <img
+                        src={imageUrl}
+                        alt={name}
+                        className="w-32 h-32 object-cover rounded-xl mt-2"
+                    />
+                )}
             </div>
             <div className="flex flex-col flex-1 p-1 text-black text-center">
                 <p>{tags}</p>

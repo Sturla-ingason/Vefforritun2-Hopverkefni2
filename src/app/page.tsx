@@ -11,6 +11,7 @@ type TaskType = {
   description?: string | null
   tags?: string | null
   done: boolean
+  imageUrl?: string | null
 }
 
 export default function Home() {
@@ -52,6 +53,7 @@ export default function Home() {
         description={task.description}
         tags={task.tags}
         done={task.done}
+        imageUrl={task.imageUrl}
       />
     ))
   }
