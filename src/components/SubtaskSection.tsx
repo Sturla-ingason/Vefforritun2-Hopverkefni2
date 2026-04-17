@@ -39,7 +39,7 @@ export default function SubtaskSection({ taskId, initialSubtasks }: Props) {
 
     return (
         <div className="flex flex-col gap-2">
-            <div className="flex gap-2 mt-2">
+            <div className="flex gap-2 mt-2 md:flex-row flex-col">
                 <input
                     value={newSubtask}
                     onChange={e => setNewSubtask(e.target.value)}

@@ -17,7 +17,7 @@ export default function Tag({ name, id, onDelete }: TagProps) {
     }
 
     return (
-        <div className="flex justify-between items-center bg-white rounded-2xl m-2 p-4 col-start-3 col-end-11 text-black">
+        <div className="flex justify-between items-center bg-white rounded-2xl m-2 p-4 col-start-3 col-end-11 text-black sm:flex-row flex-col">
             <p className="font-semibold">{name}</p>
             <button onClick={handleDelete} className="bg-red-500 text-white rounded-2xl px-3 py-1 text-sm">Delete</button>
         </div>

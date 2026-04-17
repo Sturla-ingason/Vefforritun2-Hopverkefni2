@@ -212,8 +212,8 @@ export default function TaskPage() {
 
     return (
         <main className="grid grid-cols-12 min-h-screen">
-            <div className="col-start-3 col-end-11 bg-white rounded-2xl m-8 p-8 text-black flex flex-col gap-4">
-                <div className='justify-between flex'>
+            <div className="col-start-1 col-end-13 bg-white rounded-2xl m-8 p-8 text-black flex flex-col gap-4 md:col-start-3 md:col-end-11">
+                <div className='justify-between flex md:flex-row flex-col'>
                     {isEditing ? (
                         <input
                             value={editName}
@@ -306,7 +306,7 @@ export default function TaskPage() {
                     <span className="font-semibold">Created:</span>
                     <span>{new Date(task.createdAt).toLocaleDateString()}</span>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 ">
                     <span className="font-semibold">Updated:</span>
                     <span>{new Date(task.updatedAt).toLocaleDateString()}</span>
                 </div>
