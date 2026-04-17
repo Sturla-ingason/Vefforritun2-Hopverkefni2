@@ -46,7 +46,7 @@ export default function Task({ id, name, description, tags, done, imageUrl }: Ta
             <div className="flex flex-col flex-1 p-1 text-black text-center">
                 <p>{tags}</p>
             </div>
-            <div className="flex flex-col flex-1 p-3 text-black">
+            <div className="flex md:flex-col flex-1 p-3 text-black flex-row">
                 <button onClick={handleDone} className="bg-green p-1 m-1 rounded-2xl">
                     {isDone ? 'Undo' : 'Done'}
                 </button>
